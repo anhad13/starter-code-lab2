@@ -140,24 +140,14 @@ func serve(s *KVStore, r *rand.Rand, peers *arrayPeers, id string, port int) {
 	// Run forever handling inputs from various channels
 	for {
 		select {
-		case <-timer.C:
-			// The timer went off.
-			log.Printf("Timeout")
-			for p, c := range peerClients {
-				// Send in parallel so we don't wait for each client.
-				go func(c pb.RaftClient, p string) {
-					ret, err := c.RequestVote(context.Background(), &pb.RequestVoteArgs{Term: 1, CandidateID: id})
-					voteResponseChan <- VoteResponse{ret: ret, err: err, peer: p}
-				}(c, p)
-			}
-			// This will also take care of any pesky timeouts that happened while processing the operation.
-			restartTimer(timer, r)
 		case op := <-s.C:
 			// We received an operation from a client
 			// TODO: Figure out if you can actually handle the request here. If not use the Redirect result to send the
 			// client elsewhere.
 			// TODO: Use Raft to make sure it is safe to actually run the command.
 			s.HandleCommand(op)
+		case ae := <-raft.NewClientRequestChan:
+
 		case ae := <-raft.AppendChan:
 			// We received an AppendEntries request from a Raft peer
 			// TODO figure out what to do here, what we do is entirely wrong.
