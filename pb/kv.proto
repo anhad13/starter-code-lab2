@@ -116,8 +116,21 @@ message RequestVoteRet {
     bool voteGranted = 2;
 }
 
+message ClientReqArgs {
+    int64 term = 1;
+    string request_type=2;
+    string key=3;
+    string value=4;
+}
+
+message ClientReqRet {
+    int64 didwork = 1;
+}
+
+
 // Raft service
 service Raft {
+    rpc NewClientRequest(ClientReqArgs) returns (ClientReqRet) {
     rpc AppendEntries(AppendEntriesArgs) returns (AppendEntriesRet) {}
     rpc RequestVote(RequestVoteArgs) returns (RequestVoteRet) {}
 }

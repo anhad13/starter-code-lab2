@@ -147,32 +147,9 @@ func serve(s *KVStore, r *rand.Rand, peers *arrayPeers, id string, port int) {
 			// TODO: Use Raft to make sure it is safe to actually run the command.
 			s.HandleCommand(op)
 		case ae := <-raft.NewClientRequestChan:
-
-		case ae := <-raft.AppendChan:
-			// We received an AppendEntries request from a Raft peer
-			// TODO figure out what to do here, what we do is entirely wrong.
-			log.Printf("Received append entry from %v", ae.arg.LeaderID)
-			ae.response <- pb.AppendEntriesRet{Term: 1, Success: true}
-			// This will also take care of any pesky timeouts that happened while processing the operation.
-			restartTimer(timer, r)
-		case vr := <-raft.VoteChan:
-			// We received a RequestVote RPC from a raft peer
-			// TODO: Fix this.
-			log.Printf("Received vote request from %v", vr.arg.CandidateID)
-			vr.response <- pb.RequestVoteRet{Term: 1, VoteGranted: false}
-		case vr := <-voteResponseChan:
-			// We received a response to a previou vote request.
-			// TODO: Fix this
-			if vr.err != nil {
-				// Do not do Fatalf here since the peer might be gone but we should survive.
-				log.Printf("Error calling RPC %v", vr.err)
-			} else {
-				log.Printf("Got response to vote request from %v", vr.peer)
-				log.Printf("Peers %s granted %v term %v", vr.peer, vr.ret.VoteGranted, vr.ret.Term)
-			}
-		case ar := <-appendResponseChan:
-			// We received a response to a previous AppendEntries RPC call
-			log.Printf("Got append entries response from %v", ar.peer)
+			log.Printf("Recd New client request.")
+			response:=pb.ClientReqRet{diditwork=1}
+			ae.Response<-response
 		}
 	}
 	log.Printf("Strange to arrive here")
