@@ -117,20 +117,47 @@ message RequestVoteRet {
 }
 
 message ClientReqArgs {
-    int64 term = 1;
-    string request_type=2;
-    string key=3;
-    string value=4;
+    int64 timestamp = 1;
+    string operation = 2;
+    Result res=3;
+    string client=4;
 }
 
 message ClientReqRet {
     int64 didwork = 1;
+    int64 timestamp=2;
 }
+
+message MsgRet{
+    int64 sequenceno=1;
+    bool success=2;
+    string node=3;
+    string typeofmsg=4;
+}
+message PrePrepareArgs{
+    int64 sequenceno=1;
+    string digest=2;
+    string node=3; 
+    ClientReqArgs clientrequest=4;
+}
+
+message PrepareArgs{
+    int64 sequenceno=1;
+    string digest=2;
+    string node=3; 
+}
+message CommitArgs{
+    int64 sequenceno=1;
+    string digest=2;
+    string node=3; 
+}
+
 
 
 // Raft service
 service Raft {
-    rpc NewClientRequest(ClientReqArgs) returns (ClientReqRet) {
-    rpc AppendEntries(AppendEntriesArgs) returns (AppendEntriesRet) {}
-    rpc RequestVote(RequestVoteArgs) returns (RequestVoteRet) {}
+    rpc NewClientRequest(ClientReqArgs) returns (ClientReqRet) {}
+    rpc PrePrepare(PrePrepareArgs) returns (MsgRet) {}
+    rpc Prepare(PrepareArgs) returns (MsgRet) {}
+    rpc Commit(CommitArgs) returns (MsgRet) {}
 }
