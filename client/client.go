@@ -172,7 +172,7 @@ func main() {
 				validResp+=1
 				log.Printf("Answer: %v", cr.Arg.Res.Result)
 			}else{
-				log.Printf("Did not match!")
+				//log.Printf("Did not match!")
 			}
 		}
 		log.Printf("Success Received!")
